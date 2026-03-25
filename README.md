@@ -41,7 +41,6 @@ This happens once. After that, the ML service is managed automatically in the ba
     eridian translate          Speak and get meaning units back
     eridian edit               Interactive TUI to manage entries
     eridian clean              Wipe all entries for active language
-    eridian rebuild            Manually recompute centroids
     eridian status             Dictionary size, last rebuild, active language
 ---
 
