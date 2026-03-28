@@ -81,6 +81,19 @@ type rootModel struct {
 	quote        string
 	cursor       int
 	spinner      spinner.Model
+	childModel   tea.Model
+}
+
+type backToMenuMsg struct{}
+
+// todo: continue to add more as you go
+func modelForScreen(s Screen) tea.Model {
+	switch s {
+	case New:
+		return newModel{}
+	default:
+		return nil
+	}
 }
 
 func initialModel(quoteIndex int, activeScreen Screen) rootModel {
@@ -108,39 +121,45 @@ func (m rootModel) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m rootModel) invokeCmd(cmd string) {
-	switch cmd {
-	case "new":
-
-	}
-}
-
 func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
 
-	case tea.KeyPressMsg:
+	switch msg.(type) {
+	case backToMenuMsg:
+		m.activeScreen = Root
+	}
 
-		switch msg.String() {
+	if m.activeScreen == Root {
+		switch msg := msg.(type) {
 
-		case "ctrl+c", "q":
-			return m, tea.Quit
+		case tea.KeyPressMsg:
 
-		case "up":
-			if m.cursor > 0 {
-				m.cursor--
+			switch msg.String() {
+
+			case "ctrl+c", "q":
+				return m, tea.Quit
+
+			case "up":
+				if m.cursor > 0 {
+					m.cursor--
+				}
+
+			case "down":
+				if m.cursor < len(m.items)-1 {
+					m.cursor++
+				}
+
+			case "enter", "space":
+				m.activeScreen = m.items[m.cursor].choice
+				m.childModel = modelForScreen(m.activeScreen)
 			}
-
-		case "down":
-			if m.cursor < len(m.items)-1 {
-				m.cursor++
-			}
-
-		case "enter", "space":
-			// todo
+		default:
+			var cmd tea.Cmd
+			m.spinner, cmd = m.spinner.Update(msg)
+			return m, cmd
 		}
-	default:
-		var cmd tea.Cmd
-		m.spinner, cmd = m.spinner.Update(msg)
+	} else {
+		model, cmd := m.childModel.Update(msg)
+		m.childModel = model
 		return m, cmd
 	}
 
@@ -148,20 +167,24 @@ func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m rootModel) View() tea.View {
-	var s strings.Builder
-	s.WriteString(titleStyle.Render(eridianTitle) + "\n" + italicStyle.Render(m.quote) + " " + m.spinner.View() + "\n\n")
+	if m.activeScreen == Root {
+		var s strings.Builder
+		s.WriteString(titleStyle.Render(eridianTitle) + "\n" + italicStyle.Render(m.quote) + " " + m.spinner.View() + "\n\n")
 
-	for i, item := range m.items {
-		if m.cursor == i {
-			s.WriteString(selectedStyle.Render("> "+item.choice.String()+" ("+item.description+")") + "\n")
-		} else {
-			s.WriteString(normalStyle.Render("  "+item.choice.String()) + "\n")
+		for i, item := range m.items {
+			if m.cursor == i {
+				s.WriteString(selectedStyle.Render("> "+item.choice.String()+" ("+item.description+")") + "\n")
+			} else {
+				s.WriteString(normalStyle.Render("  "+item.choice.String()) + "\n")
+			}
 		}
+
+		s.WriteString(titleStyle.Render("\nPress q to quit.\n"))
+
+		return tea.NewView(s.String())
+	} else {
+		return m.childModel.View()
 	}
-
-	s.WriteString(titleStyle.Render("\nPress q to quit.\n"))
-
-	return tea.NewView(s.String())
 }
 
 var rootCmd = &cobra.Command{
