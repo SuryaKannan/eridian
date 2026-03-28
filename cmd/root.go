@@ -33,6 +33,36 @@ var eridianQuotes = []string{
 	`"you poked it with a stick?"`,
 }
 
+type Screen int
+
+const (
+	Root Screen = iota
+	New
+	Use
+	List
+	Label
+	Translate
+	Edit
+	Status
+	Clean
+)
+
+var screenName = map[Screen]string{
+	Root:      "root",
+	New:       "new",
+	Use:       "use",
+	List:      "list",
+	Label:     "label",
+	Translate: "translate",
+	Edit:      "edit",
+	Status:    "status",
+	Clean:     "clean",
+}
+
+func (s Screen) String() string {
+	return screenName[s]
+}
+
 var (
 	titleStyle    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#F2A17C"))
 	selectedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00604d")).Bold(true)
@@ -41,41 +71,51 @@ var (
 )
 
 type menuItem struct {
-	choice, description string
+	choice      Screen
+	description string
 }
 
-type model struct {
-	items   []menuItem
-	quote   string
-	cursor  int
-	spinner spinner.Model
+type rootModel struct {
+	activeScreen Screen
+	items        []menuItem
+	quote        string
+	cursor       int
+	spinner      spinner.Model
 }
 
-func initialModel(quoteIndex int) model {
+func initialModel(quoteIndex int, activeScreen Screen) rootModel {
 	s := spinner.New()
 	s.Spinner = spinner.Jump
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#00604d"))
-	return model{
+	return rootModel{
+		activeScreen: activeScreen,
 		items: []menuItem{
-			{choice: "new", description: "Create a new language dictionary"},
-			{choice: "use", description: "Switch active language context"},
-			{choice: "list", description: "Show all languages"},
-			{choice: "label", description: "Capture mic audio and assign label"},
-			{choice: "translate", description: "Capture audio and return translation"},
-			{choice: "edit", description: "Manage and delete entries"},
-			{choice: "status", description: "Show active language, dictionary size, and last rebuild"},
-			{choice: "clean", description: "Wipe all entries for the active language"},
+			{choice: New, description: "Create a new language dictionary"},
+			{choice: Use, description: "Switch active language context"},
+			{choice: List, description: "Show all languages"},
+			{choice: Label, description: "Capture mic audio and assign label"},
+			{choice: Translate, description: "Capture audio and return translation"},
+			{choice: Edit, description: "Manage and delete entries"},
+			{choice: Status, description: "Show active language, dictionary size, and last rebuild"},
+			{choice: Clean, description: "Wipe all entries for the active language"},
 		},
 		quote:   eridianQuotes[quoteIndex],
 		spinner: s,
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m rootModel) Init() tea.Cmd {
 	return m.spinner.Tick
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m rootModel) invokeCmd(cmd string) {
+	switch cmd {
+	case "new":
+
+	}
+}
+
+func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case tea.KeyPressMsg:
@@ -96,7 +136,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "enter", "space":
-
+			// todo
 		}
 	default:
 		var cmd tea.Cmd
@@ -107,15 +147,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() tea.View {
+func (m rootModel) View() tea.View {
 	var s strings.Builder
 	s.WriteString(titleStyle.Render(eridianTitle) + "\n" + italicStyle.Render(m.quote) + " " + m.spinner.View() + "\n\n")
 
 	for i, item := range m.items {
 		if m.cursor == i {
-			s.WriteString(selectedStyle.Render("> "+item.choice+" ("+item.description+")") + "\n")
+			s.WriteString(selectedStyle.Render("> "+item.choice.String()+" ("+item.description+")") + "\n")
 		} else {
-			s.WriteString(normalStyle.Render("  "+item.choice) + "\n")
+			s.WriteString(normalStyle.Render("  "+item.choice.String()) + "\n")
 		}
 	}
 
@@ -128,7 +168,7 @@ var rootCmd = &cobra.Command{
 	Use:   "eridian",
 	Short: "Eridian is a language dictionary that semantically translates one language to another",
 	Run: func(cmd *cobra.Command, args []string) {
-		p := tea.NewProgram(initialModel(rand.IntN(len(eridianQuotes))))
+		p := tea.NewProgram(initialModel(rand.IntN(len(eridianQuotes)), Root))
 		if _, err := p.Run(); err != nil {
 			fmt.Printf("Error running Eridian! Check setup: %v", err)
 			os.Exit(1)
