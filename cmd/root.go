@@ -20,9 +20,8 @@ var eridianTitle = `
 	░█▀▀░█▀▄░░█░░█░█░░█░░█▀█░█░█
 	░▀▀▀░▀░▀░▀▀▀░▀▀░░▀▀▀░▀░▀░▀░▀
 
-
 ####################################
-###################################                                                                                                  
+####################################          
 `
 
 var eridianQuotes = []string{
@@ -86,11 +85,28 @@ type rootModel struct {
 
 type backToMenuMsg struct{}
 
-// todo: continue to add more as you go
+func returnToRoot() tea.Msg {
+	return backToMenuMsg{}
+}
+
 func modelForScreen(s Screen) tea.Model {
 	switch s {
 	case New:
 		return newModel{}
+	case Use:
+		return useModel{}
+	case List:
+		return listModel{}
+	case Label:
+		return labelModel{}
+	case Translate:
+		return translateModel{}
+	case Edit:
+		return editModel{}
+	case Status:
+		return statusModel{}
+	case Clean:
+		return cleanModel{}
 	default:
 		return nil
 	}
@@ -126,6 +142,7 @@ func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg.(type) {
 	case backToMenuMsg:
 		m.activeScreen = Root
+		return m, m.spinner.Tick
 	}
 
 	if m.activeScreen == Root {

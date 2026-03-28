@@ -6,14 +6,14 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
-type newModel struct {
+type cleanModel struct {
 }
 
-func (m newModel) Init() tea.Cmd {
+func (m cleanModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m newModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m cleanModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 
@@ -30,8 +30,8 @@ func (m newModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m newModel) View() tea.View {
+func (m cleanModel) View() tea.View {
 	var s strings.Builder
-	s.WriteString(normalStyle.Render("New command!") + "\n\n")
+	s.WriteString(normalStyle.Render("Clean command!") + "\n\n")
 	return tea.NewView(s.String())
 }
