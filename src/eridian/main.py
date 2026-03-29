@@ -1,12 +1,13 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 import os
 
-app = FastAPI()
+app = FastAPI(openapi_url="/api/openapi.json")
+app.openapi_version = "3.0.2"
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.get("/health")
+def health():
+    return status.HTTP_200_OK
 
 def start() -> None:
     print(f"Eridian backend running on PID: {os.getpid()}")
