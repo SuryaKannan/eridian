@@ -92,7 +92,7 @@ func returnToRoot() tea.Msg {
 func modelForScreen(s Screen) tea.Model {
 	switch s {
 	case New:
-		return newModel{}
+		return initNewModel()
 	case Use:
 		return useModel{}
 	case List:
@@ -168,6 +168,7 @@ func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "enter", "space":
 				m.activeScreen = m.items[m.cursor].choice
 				m.childModel = modelForScreen(m.activeScreen)
+				return m, m.childModel.Init()
 			}
 		default:
 			var cmd tea.Cmd
@@ -198,9 +199,13 @@ func (m rootModel) View() tea.View {
 
 		s.WriteString(titleStyle.Render("\nPress q to quit.\n"))
 
-		return tea.NewView(s.String())
+		view := tea.NewView(s.String())
+		view.AltScreen = true
+		return view
 	} else {
-		return m.childModel.View()
+		view := m.childModel.View()
+		view.AltScreen = true
+		return view
 	}
 }
 
