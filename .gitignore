@@ -1,17 +1,6 @@
 # Go
 bin/
 
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-dist/
-.venv/
-
-# Environment
-.env
-.python-version
-
 # IDE
 .idea/
 .vscode/

@@ -51,7 +51,6 @@ const (
 var ScreenName = map[Screen]string{
 	Root:      "root",
 	New:       "new",
-	Use:       "use",
 	List:      "list",
 	Label:     "label",
 	Translate: "translate",
@@ -66,7 +65,7 @@ func (s Screen) String() string {
 
 var (
 	titleStyle    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#F2A17C"))
-	selectedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00604d")).Bold(true)
+	selectedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#258270")).Bold(true)
 	normalStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#F2A17C"))
 	italicStyle   = normalStyle.Italic(true)
 )
@@ -105,8 +104,6 @@ func modelForScreen(s Screen) tea.Model {
 	switch s {
 	case New:
 		return initNewModel()
-	case Use:
-		return useModel{}
 	case List:
 		return listModel{}
 	case Label:
@@ -127,7 +124,7 @@ func modelForScreen(s Screen) tea.Model {
 func initialModel(quoteIndex int, activeScreen Screen) rootModel {
 	s := spinner.New()
 	s.Spinner = spinner.Jump
-	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#00604d"))
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#236759"))
 	activeLanguage := resolveActiveLanguage()
 
 	return rootModel{
@@ -135,8 +132,7 @@ func initialModel(quoteIndex int, activeScreen Screen) rootModel {
 		activeLanguage: activeLanguage,
 		items: []menuItem{
 			{choice: New, description: "Create a new language dictionary"},
-			{choice: Use, description: "Switch active language"},
-			{choice: List, description: "Show all languages"},
+			{choice: List, description: "View all languages and switch active"},
 			{choice: Label, description: "Capture mic audio and assign labels"},
 			{choice: Translate, description: "Capture audio and return live translation"},
 			{choice: Edit, description: "Manage and delete entries for active language"},
@@ -205,7 +201,7 @@ func (m rootModel) View() tea.View {
 		var s strings.Builder
 		s.WriteString(titleStyle.Render(eridianTitle) + "\n" + italicStyle.Render(m.quote) + " " + m.spinner.View() + "\n\n")
 
-		s.WriteString(titleStyle.Render("Current language: ") + normalStyle.Render(m.activeLanguage) + "\n\n")
+		s.WriteString(titleStyle.Render("Current language: ") + selectedStyle.Render(m.activeLanguage) + "\n\n")
 
 		for i, item := range m.items {
 			if m.cursor == i {
