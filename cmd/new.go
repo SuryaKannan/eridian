@@ -11,11 +11,15 @@ func initNewModel() newModel {
 	ti := textinput.New()
 	ti.Placeholder = "new language"
 	ti.Focus()
-	return newModel{ti}
+	return newModel{
+		screenName: ScreenName[New],
+		textInput:  ti,
+	}
 }
 
 type newModel struct {
-	textInput textinput.Model
+	screenName string
+	textInput  textinput.Model
 }
 
 func (m newModel) Init() tea.Cmd {
@@ -46,11 +50,13 @@ func (m newModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m newModel) View() tea.View {
 	var s strings.Builder
 
-	s.WriteString(titleStyle.Render("\nEnter name of your new language!\n") + "\n\n")
+	s.WriteString(selectedStyle.Render("(home/" + m.screenName + ")" + "\n\n"))
+
+	s.WriteString(normalStyle.Render("\nEnter the name of your new language!\n") + "\n\n")
 
 	s.WriteString(normalStyle.Render("> "+m.textInput.Value()) + "\n\n")
 
-	s.WriteString(titleStyle.Render("\nPress ESC to return to main screen.\n"))
+	s.WriteString(titleStyle.Render("\nPress ESC to return home.\n"))
 
 	return tea.NewView(s.String())
 }

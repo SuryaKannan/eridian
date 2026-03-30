@@ -1,5 +1,6 @@
 package config
 
 type Config struct {
-	ActiveLanguage string `json:"activeLanguage"`
+	Languages      []string `json:"languages"`
+	ActiveLanguage string   `json:"activeLanguage"`
 }

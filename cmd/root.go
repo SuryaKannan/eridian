@@ -9,6 +9,7 @@ import (
 	"charm.land/bubbles/v2/spinner"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
+	"github.com/SuryaKannan/eridian/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -25,11 +26,12 @@ var eridianTitle = `
 `
 
 var eridianQuotes = []string{
-	`"fist my bump"`,
-	`"amaze amaze amaze"`,
+	`"fist my bump."`,
+	`"amaze amaze amaze!"`,
 	`"usually you not stupid. Why stupid, question?"`,
 	`"hold screws better."`,
 	`"you poked it with a stick?"`,
+	`"Rocky hate Mark."`,
 }
 
 type Screen int
@@ -46,7 +48,7 @@ const (
 	Clean
 )
 
-var screenName = map[Screen]string{
+var ScreenName = map[Screen]string{
 	Root:      "root",
 	New:       "new",
 	Use:       "use",
@@ -59,7 +61,7 @@ var screenName = map[Screen]string{
 }
 
 func (s Screen) String() string {
-	return screenName[s]
+	return ScreenName[s]
 }
 
 var (
@@ -120,13 +122,13 @@ func initialModel(quoteIndex int, activeScreen Screen) rootModel {
 		activeScreen: activeScreen,
 		items: []menuItem{
 			{choice: New, description: "Create a new language dictionary"},
-			{choice: Use, description: "Switch active language context"},
+			{choice: Use, description: "Switch active language"},
 			{choice: List, description: "Show all languages"},
-			{choice: Label, description: "Capture mic audio and assign label"},
-			{choice: Translate, description: "Capture audio and return translation"},
-			{choice: Edit, description: "Manage and delete entries"},
+			{choice: Label, description: "Capture mic audio and assign labels"},
+			{choice: Translate, description: "Capture audio and return live translation"},
+			{choice: Edit, description: "Manage and delete entries for active language"},
 			{choice: Status, description: "Show active language, dictionary size, and last rebuild"},
-			{choice: Clean, description: "Wipe all entries for the active language"},
+			{choice: Clean, description: "Wipe the active language"},
 		},
 		quote:   eridianQuotes[quoteIndex],
 		spinner: s,
@@ -213,6 +215,10 @@ var rootCmd = &cobra.Command{
 	Use:   "eridian",
 	Short: "Eridian is a language dictionary that semantically translates one language to another",
 	Run: func(cmd *cobra.Command, args []string) {
+		if err := config.SyncConfig(); err != nil {
+			fmt.Printf("Error syncing config: %v\n", err)
+			os.Exit(1)
+		}
 		p := tea.NewProgram(initialModel(rand.IntN(len(eridianQuotes)), Root))
 		if _, err := p.Run(); err != nil {
 			fmt.Printf("Error running Eridian! Check setup: %v", err)
