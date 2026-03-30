@@ -36,21 +36,6 @@ func initialiseEridianHome(path string) error {
 
 }
 
-func writeConfig(path string, c *Config) error {
-
-	jsonData, err := json.MarshalIndent(c, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to write eridian config: %w", err)
-	}
-
-	err = os.WriteFile(filepath.Join(path, "config.json"), jsonData, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to write eridian config: %w", err)
-	}
-
-	return nil
-}
-
 func syncCurrentLanguage(path string) error {
 
 	content, err := os.ReadFile(filepath.Join(path, "config.json"))

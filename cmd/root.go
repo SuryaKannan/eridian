@@ -77,17 +77,27 @@ type menuItem struct {
 }
 
 type rootModel struct {
-	activeScreen Screen
-	items        []menuItem
-	quote        string
-	cursor       int
-	spinner      spinner.Model
-	childModel   tea.Model
+	activeScreen   Screen
+	activeLanguage string
+	items          []menuItem
+	quote          string
+	cursor         int
+	spinner        spinner.Model
+	childModel     tea.Model
+}
+
+func resolveActiveLanguage() string {
+	cfg := config.FetchConfig()
+	if cfg.ActiveLanguage == "" {
+		return "No language found! Create a new one"
+	}
+	return cfg.ActiveLanguage
 }
 
 type backToMenuMsg struct{}
 
 func returnToRoot() tea.Msg {
+	config.SyncConfig()
 	return backToMenuMsg{}
 }
 
@@ -118,8 +128,11 @@ func initialModel(quoteIndex int, activeScreen Screen) rootModel {
 	s := spinner.New()
 	s.Spinner = spinner.Jump
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#00604d"))
+	activeLanguage := resolveActiveLanguage()
+
 	return rootModel{
-		activeScreen: activeScreen,
+		activeScreen:   activeScreen,
+		activeLanguage: activeLanguage,
 		items: []menuItem{
 			{choice: New, description: "Create a new language dictionary"},
 			{choice: Use, description: "Switch active language"},
@@ -143,6 +156,7 @@ func (m rootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg.(type) {
 	case backToMenuMsg:
+		m.activeLanguage = resolveActiveLanguage()
 		m.activeScreen = Root
 		return m, m.spinner.Tick
 	}
@@ -190,6 +204,8 @@ func (m rootModel) View() tea.View {
 	if m.activeScreen == Root {
 		var s strings.Builder
 		s.WriteString(titleStyle.Render(eridianTitle) + "\n" + italicStyle.Render(m.quote) + " " + m.spinner.View() + "\n\n")
+
+		s.WriteString(titleStyle.Render("Current language: ") + normalStyle.Render(m.activeLanguage) + "\n\n")
 
 		for i, item := range m.items {
 			if m.cursor == i {
