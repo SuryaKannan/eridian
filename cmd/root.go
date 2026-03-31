@@ -105,7 +105,7 @@ func modelForScreen(s Screen) tea.Model {
 	case New:
 		return initNewModel()
 	case List:
-		return listModel{}
+		return initListModel()
 	case Label:
 		return labelModel{}
 	case Translate:
