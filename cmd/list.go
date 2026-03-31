@@ -66,7 +66,7 @@ func (m listModel) View() tea.View {
 	s.WriteString(selectedStyle.Render("(home/"+m.screenName+")") + "\n\n")
 
 	if len(m.languages) == 0 {
-		s.WriteString(titleStyle.Render("No languages yet! Create one first." + "\n\n"))
+		s.WriteString(normalStyle.Render("No languages found! Create one first." + "\n\n"))
 	} else {
 		s.WriteString(titleStyle.Render("Current language:") + " " + selectedStyle.Render(m.activeLanguage) + "\n\n")
 		for i, language := range m.languages {

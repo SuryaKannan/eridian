@@ -45,7 +45,11 @@ func (m newModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "enter":
+			if strings.TrimSpace(m.textInput.Value()) == "" {
+				return m, nil
+			}
 			if m.result != "" {
+
 				m.result = ""
 				m.textInput.Reset()
 				return m, nil
@@ -67,7 +71,7 @@ func (m newModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m newModel) View() tea.View {
 	var s strings.Builder
 
-	s.WriteString(selectedStyle.Render("(home/" + m.screenName + ")" + "\n\n"))
+	s.WriteString(selectedStyle.Render("(home/"+m.screenName+")") + "\n\n")
 
 	if m.result == "" {
 		s.WriteString(normalStyle.Render("\nEnter the name of your new language!\n") + "\n\n")
@@ -76,9 +80,12 @@ func (m newModel) View() tea.View {
 
 	} else {
 		s.WriteString(normalStyle.Render(m.result) + "\n\n")
+		s.WriteString(italicStyle.Render("Press enter to try again.") + "\n\n")
 	}
 
 	s.WriteString(titleStyle.Render("\nPress ESC to return home.\n"))
 
-	return tea.NewView(s.String())
+	view := tea.NewView(s.String())
+	view.AltScreen = true
+	return view
 }
