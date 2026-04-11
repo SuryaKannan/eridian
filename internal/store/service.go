@@ -60,3 +60,15 @@ func (s *Store) CreateLanguageDB() error {
 
 	return nil
 }
+
+func (s *Store) DeleteLanguageDB() error {
+	dbPath := filepath.Join(s.eridianHome, s.language+".db")
+
+	err := os.Remove(dbPath)
+
+	if err != nil {
+		return fmt.Errorf("error deleting language db: %w", err)
+	}
+
+	return nil
+}

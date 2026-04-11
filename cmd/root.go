@@ -88,7 +88,7 @@ type rootModel struct {
 func resolveActiveLanguage() string {
 	cfg := config.FetchConfig()
 	if cfg.ActiveLanguage == "" {
-		return "No language found! Create a new one"
+		return "No active language selected! Select from list menu"
 	}
 	return cfg.ActiveLanguage
 }
@@ -115,7 +115,7 @@ func modelForScreen(s Screen) tea.Model {
 	case Status:
 		return statusModel{}
 	case Clean:
-		return cleanModel{}
+		return initCleanModel()
 	default:
 		return nil
 	}

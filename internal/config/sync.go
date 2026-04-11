@@ -32,7 +32,7 @@ func initialiseEridianHome(path string) error {
 		Languages:      []string{},
 	}
 
-	return writeConfig(path, &emptyConfig)
+	return writeConfig(&emptyConfig)
 
 }
 
@@ -80,7 +80,7 @@ func syncCurrentLanguage(path string) error {
 		Languages:      languages,
 	}
 
-	return writeConfig(path, &updatedConfig)
+	return writeConfig(&updatedConfig)
 
 }
 

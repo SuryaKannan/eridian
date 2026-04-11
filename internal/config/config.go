@@ -17,7 +17,9 @@ func EridianHome() string {
 	return filepath.Join(home, ".eridian")
 }
 
-func writeConfig(path string, c *Config) error {
+func writeConfig(c *Config) error {
+
+	path := EridianHome()
 
 	jsonData, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
@@ -47,5 +49,5 @@ func FetchConfig() *Config {
 func SetActiveLanguage(language string) error {
 	cfg := FetchConfig()
 	cfg.ActiveLanguage = language
-	return writeConfig(EridianHome(), cfg)
+	return writeConfig(cfg)
 }
