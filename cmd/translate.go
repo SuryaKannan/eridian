@@ -6,7 +6,14 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
+func initTranslateModel() translateModel {
+	return translateModel{
+		screenName: ScreenName[Translate],
+	}
+}
+
 type translateModel struct {
+	screenName string
 }
 
 func (m translateModel) Init() tea.Cmd {
@@ -21,7 +28,7 @@ func (m translateModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch msg.String() {
 
-		case "q":
+		case "esc":
 			return m, returnToRoot
 		case "ctrl+c":
 			return m, tea.Quit
@@ -32,6 +39,12 @@ func (m translateModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m translateModel) View() tea.View {
 	var s strings.Builder
-	s.WriteString(normalStyle.Render("Translate command!") + "\n\n")
-	return tea.NewView(s.String())
+
+	s.WriteString(selectedStyle.Render("(home/"+m.screenName+")") + "\n\n")
+
+	s.WriteString(titleStyle.Render("\nPress ESC to return home.\n"))
+
+	view := tea.NewView(s.String())
+	view.AltScreen = true
+	return view
 }

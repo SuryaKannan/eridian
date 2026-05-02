@@ -107,13 +107,13 @@ func modelForScreen(s Screen) tea.Model {
 	case List:
 		return initListModel()
 	case Label:
-		return labelModel{}
+		return initLabelModel()
 	case Translate:
-		return translateModel{}
+		return initTranslateModel()
 	case Edit:
-		return editModel{}
+		return initEditModel()
 	case Status:
-		return statusModel{}
+		return initStatusModel()
 	case Clean:
 		return initCleanModel()
 	default:
